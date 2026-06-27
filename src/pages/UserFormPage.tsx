@@ -4,6 +4,7 @@ import { useState } from "react";
 import UserForm from "../components/UserForm";
 import { useUsers } from "../context/UserContext";
 import type { UserInput } from "../types/user";
+import { formatAddress } from "../utils/formatAddress";
 import { handlePointerMove, handlePointerLeave } from "../utils/pointerGlow";
 
 type UserFormPageProps = {
@@ -22,9 +23,7 @@ export default function UserFormPage({ mode }: UserFormPageProps) {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        address: [user.address?.suite, user.address?.street, user.address?.city]
-          .filter(Boolean)
-          .join(", "),
+        address: formatAddress(user.address),
         profession: user.company?.name ?? "",
       }
     : undefined;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useUsers } from "../context/UserContext";
 import type { User } from "../types/user";
+import { formatAddress } from "../utils/formatAddress";
 import { handlePointerMove, handlePointerLeave } from "../utils/pointerGlow";
 
 export default function UserDetailPage() {
@@ -47,9 +48,7 @@ export default function UserDetailPage() {
     );
   }
 
-  const address = [user.address?.suite, user.address?.street, user.address?.city]
-    .filter(Boolean)
-    .join(", ");
+  const address = formatAddress(user.address);
   const profession = user.company?.name || "Not provided";
   const professionNote = user.company?.catchPhrase || user.company?.bs || "";
 

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { ChevronRight, Edit3, Trash2 } from "lucide-react";
+import { ChevronRight, Edit3, MapPin, Trash2 } from "lucide-react";
 import type { User } from "../types/user";
+import { formatShortLocation } from "../utils/formatAddress";
 import { handlePointerMove, handlePointerLeave } from "../utils/pointerGlow";
 
 type UserListProps = {
@@ -23,7 +24,7 @@ export default function UserList({ users, deletingId, onDelete }: UserListProps)
     <section className="directory-list" aria-label="Users">
       {users.map((user) => {
         const profession = user.company?.name ?? "Contact";
-        const city = user.address?.city;
+        const location = formatShortLocation(user.address);
 
         return (
           <article
@@ -47,13 +48,17 @@ export default function UserList({ users, deletingId, onDelete }: UserListProps)
 
               <div className="card-meta">
                 <span>{profession}</span>
-                {city && <small>{city}</small>}
+                {location && (
+                  <small className="location-chip">
+                    <MapPin size={13} aria-hidden="true" />
+                    {location}
+                  </small>
+                )}
               </div>
 
               <p className="phone-cell">{user.phone}</p>
             </Link>
 
-            {/* iOS-style disclosure chevron; yields to the action buttons on hover/focus. */}
             <ChevronRight className="row-chevron" size={18} aria-hidden="true" />
 
             <div className="row-actions" aria-label={`Actions for ${user.name}`}>

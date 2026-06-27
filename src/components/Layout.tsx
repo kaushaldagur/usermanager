@@ -10,14 +10,7 @@ export default function Layout() {
 
   return (
     <div className="app-shell">
-      {/* Title bar styled like a macOS window: traffic lights anchor the
-          glass material in something instantly recognizable as "Apple". */}
       <header className="topbar" onMouseMove={handlePointerMove} onMouseLeave={handlePointerLeave}>
-        <span className="traffic-lights" aria-hidden="true">
-          <span className="red" />
-          <span className="yellow" />
-          <span className="green" />
-        </span>
         <Link to="/" className="brand" aria-label="Go to users">
           <span className="brand-mark">
             <UsersRound size={16} aria-hidden="true" />
@@ -25,7 +18,6 @@ export default function Layout() {
           <strong>user-directory.app</strong>
         </Link>
 
-        {/* Theme toggle button */}
         <button
           className="top-action theme-toggle"
           onClick={toggleTheme}
@@ -40,7 +32,6 @@ export default function Layout() {
         </button>
       </header>
 
-      {/* Dynamic-Island-style status pill, dropping in from the notch. */}
       <div className="notice-stage">
         {notice && (
           <div

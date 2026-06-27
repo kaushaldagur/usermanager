@@ -42,7 +42,6 @@ type UserContextValue = {
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
-/** Builds the full User record a form submission turns into. */
 function buildUser(id: number, input: UserInput, existing?: User): User {
   return {
     ...existing,
@@ -71,10 +70,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const retryUsers = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
-
-    // Paint instantly from the last known-good snapshot while the network
-    // request is in flight, instead of showing a blank/skeleton state for
-    // users who already have data cached locally.
     const cached = loadSnapshot();
     if (cached.length > 0) {
       setUsers(applyLocalChanges(cached));
@@ -88,9 +83,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       const merged = applyLocalChanges(data);
       setUsers(merged);
-      saveSnapshot(data); // store the raw API list; local diffs are reapplied on top each time
+      saveSnapshot(data);
     } catch {
-      // Network failed — fall back to whatever we already have cached.
       if (cached.length === 0) {
         setLoadError("Users could not be loaded. Please try again.");
       }
@@ -112,11 +106,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const addUser = async (input: UserInput) => {
     try {
-      // Simulated — JSONPlaceholder accepts the POST and echoes it back,
-      // but never actually persists it server-side.
       await createUser(input);
     } catch {
-      // Even if the simulated request fails, keep the user locally.
     }
 
     const newUser = buildUser(Date.now() + Math.floor(Math.random() * 1000), input);
@@ -131,25 +122,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const editUser = async (id: number, input: UserInput) => {
     try {
-      // Simulated — see addUser.
       await updateUser(id, input);
     } catch {
-      // Keep the edit locally even if the simulated request fails.
     }
 
     const existingUser = findUser(id);
     const updatedUser = buildUser(id, input, existingUser);
 
     if (id >= CUSTOM_ID_THRESHOLD) {
-      // A locally-created user — update it in place in custom storage.
       const updatedCustom = loadCustomUsers().map((user) =>
         user.id === id ? updatedUser : user
       );
       saveCustomUsers(updatedCustom);
     } else {
-      // An original API user — store the edit as an override so it's
-      // re-applied on top of the (unchanging) API response on every
-      // future fetch, instead of being silently overwritten by it.
       const overrides = loadOverrides();
       overrides[String(id)] = updatedUser;
       saveOverrides(overrides);
@@ -166,18 +151,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const user = findUser(id);
 
     try {
-      // Simulated — see addUser.
       await deleteUser(id);
     } catch {
-      // Keep the deletion locally even if the simulated request fails.
     }
 
     if (id >= CUSTOM_ID_THRESHOLD) {
-      // A locally-created user — just drop it, it never existed on the API.
       saveCustomUsers(loadCustomUsers().filter((u) => u.id !== id));
     } else {
-      // An original API user — remember it's deleted so it's filtered out
-      // of every future fetch, and clear any override stored for it.
       const deletedIds = loadDeletedIds();
       if (!deletedIds.includes(id)) {
         saveDeletedIds([...deletedIds, id]);

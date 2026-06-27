@@ -7,9 +7,6 @@ type ConfirmDialogProps = {
   onCancel: () => void;
   onConfirm: () => void;
 };
-
-// Modeled on a UIAlertController: a glass card, a centered message, and a
-// row of text-only buttons split by a hairline rather than filled pills.
 export default function ConfirmDialog({
   user,
   busy,
